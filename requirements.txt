@@ -1,0 +1,12 @@
+# SRT Grammar & Spelling Checker - Requirements
+# Install with: pip install -r requirements.txt
+
+# LLM Providers (install at least one)
+google-genai>=0.3.0      # Google Gemini API (recommended)
+openai>=1.0.0            # OpenAI API
+
+# Build tools (only needed for creating executables)
+# pyinstaller>=6.0.0
+
+# Note: tkinter is included with Python by default
+# On Linux, you may need: sudo apt-get install python3-tk

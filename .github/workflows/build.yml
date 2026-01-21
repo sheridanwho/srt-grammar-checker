@@ -1,0 +1,123 @@
+# GitHub Actions Workflow for Building SRT Grammar Checker
+# This builds executables for both Windows and macOS automatically
+#
+# How to use:
+# 1. Create a GitHub repository
+# 2. Upload your Python files (srt_grammar_checker_gui.py, launcher.py)
+# 3. Create this file at: .github/workflows/build.yml
+# 4. Go to Actions tab and run the workflow
+# 5. Download the built executables from the Artifacts section
+
+name: Build Executables
+
+# Run manually from the Actions tab
+on:
+  workflow_dispatch:
+  
+  # Or automatically on push to main branch (uncomment below)
+  # push:
+  #   branches: [ main ]
+
+jobs:
+  # ============================================
+  # Build for Windows
+  # ============================================
+  build-windows:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller google-genai openai
+    
+    - name: Build executable
+      run: |
+        pyinstaller --name="SRT Grammar Checker" --onefile --windowed --add-data="srt_grammar_checker_gui.py;." --hidden-import=google.genai --hidden-import=google.generativeai --hidden-import=openai --hidden-import=tkinter --hidden-import=tkinter.ttk --hidden-import=tkinter.filedialog --hidden-import=tkinter.messagebox --hidden-import=tkinter.scrolledtext --collect-all google.genai --collect-all openai --noconfirm launcher.py
+    
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: SRT-Grammar-Checker-Windows
+        path: dist/SRT Grammar Checker.exe
+
+  # ============================================
+  # Build for macOS
+  # ============================================
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller google-genai openai
+    
+    - name: Build executable
+      run: |
+        pyinstaller --name="SRT Grammar Checker" --onefile --windowed --add-data="srt_grammar_checker_gui.py:." --hidden-import=google.genai --hidden-import=google.generativeai --hidden-import=openai --hidden-import=tkinter --hidden-import=tkinter.ttk --hidden-import=tkinter.filedialog --hidden-import=tkinter.messagebox --hidden-import=tkinter.scrolledtext --collect-all google.genai --collect-all openai --noconfirm launcher.py
+    
+    - name: Create ZIP of app
+      run: |
+        cd dist
+        zip -r "SRT Grammar Checker-Mac.zip" "SRT Grammar Checker.app" || zip -r "SRT Grammar Checker-Mac.zip" "SRT Grammar Checker"
+    
+    - name: Upload macOS executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: SRT-Grammar-Checker-macOS
+        path: dist/SRT Grammar Checker-Mac.zip
+
+  # ============================================
+  # Build Portable Version (cross-platform)
+  # ============================================
+  build-portable:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Create portable package
+      run: |
+        mkdir -p portable
+        cp srt_grammar_checker_gui.py portable/ 2>/dev/null || true
+        cp launcher.py portable/ 2>/dev/null || true
+        cp srt_checker_portable.py portable/ 2>/dev/null || true
+        cp requirements.txt portable/ 2>/dev/null || true
+        cp README.md portable/ 2>/dev/null || true
+        cp sample_subtitles.srt portable/ 2>/dev/null || true
+        
+        # Create a simple run script for Mac/Linux
+        echo '#!/bin/bash' > portable/run_mac_linux.sh
+        echo 'python3 srt_checker_portable.py' >> portable/run_mac_linux.sh
+        chmod +x portable/run_mac_linux.sh
+        
+        # Create a simple run script for Windows
+        echo '@echo off' > portable/run_windows.bat
+        echo 'python srt_checker_portable.py' >> portable/run_windows.bat
+        echo 'pause' >> portable/run_windows.bat
+        
+        zip -r portable-version.zip portable/
+    
+    - name: Upload portable version
+      uses: actions/upload-artifact@v4
+      with:
+        name: SRT-Grammar-Checker-Portable
+        path: portable-version.zip

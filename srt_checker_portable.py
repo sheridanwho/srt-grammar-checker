@@ -573,12 +573,29 @@ class SRTCheckerGUI:
         actf.pack(fill=tk.X, pady=(0, 10))
         bc = ttk.Frame(actf)
         bc.pack(fill=tk.X)
-        self.start_btn = tk.Button(bc, text="▶ START", command=self._start, font=('Helvetica', 12, 'bold'), bg='#4CAF50', fg='white', padx=20, pady=10)
-        self.start_btn.pack(side=tk.LEFT, padx=(0, 15))
-        self.stop_btn = tk.Button(bc, text="⏹ STOP", command=self._stop, font=('Helvetica', 10, 'bold'), bg='#f44336', fg='white', padx=15, pady=8, state=tk.DISABLED)
-        self.stop_btn.pack(side=tk.LEFT)
-        self.report_btn = tk.Button(bc, text="📄 Open Report", command=self._open_report, font=('Helvetica', 10), bg='#2196F3', fg='white', padx=15, pady=8, state=tk.DISABLED)
-        self.report_btn.pack(side=tk.RIGHT)
+        
+        # =========================================================================
+        # EDIT: Use ttk.Button for macOS compatibility
+        # =========================================================================
+        is_macos = sys.platform == 'darwin'
+        
+        if is_macos:
+            # macOS: Use ttk.Button (tk.Button colors don't work on Mac)
+            self.start_btn = ttk.Button(bc, text="▶ START CHECKING", command=self._start, width=20)
+            self.start_btn.pack(side=tk.LEFT, padx=(0, 15))
+            self.stop_btn = ttk.Button(bc, text="⏹ STOP", command=self._stop, width=10, state=tk.DISABLED)
+            self.stop_btn.pack(side=tk.LEFT)
+            self.report_btn = ttk.Button(bc, text="📄 Open Report", command=self._open_report, width=15, state=tk.DISABLED)
+            self.report_btn.pack(side=tk.RIGHT)
+        else:
+            # Windows/Linux: Use tk.Button with custom colors
+            self.start_btn = tk.Button(bc, text="▶ START", command=self._start, font=('Helvetica', 12, 'bold'), bg='#4CAF50', fg='white', padx=20, pady=10)
+            self.start_btn.pack(side=tk.LEFT, padx=(0, 15))
+            self.stop_btn = tk.Button(bc, text="⏹ STOP", command=self._stop, font=('Helvetica', 10, 'bold'), bg='#f44336', fg='white', padx=15, pady=8, state=tk.DISABLED)
+            self.stop_btn.pack(side=tk.LEFT)
+            self.report_btn = tk.Button(bc, text="📄 Open Report", command=self._open_report, font=('Helvetica', 10), bg='#2196F3', fg='white', padx=15, pady=8, state=tk.DISABLED)
+            self.report_btn.pack(side=tk.RIGHT)
+        # =========================================================================
         
         # Progress
         prf = ttk.LabelFrame(main, text="Progress", padding="10")

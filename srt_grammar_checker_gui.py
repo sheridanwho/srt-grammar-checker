@@ -859,55 +859,88 @@ class SRTCheckerGUI:
         button_container = ttk.Frame(action_frame)
         button_container.pack(fill=tk.X)
         
-        # Main START button - large and prominent
-        self.start_btn = tk.Button(
-            button_container, 
-            text="▶  START CHECKING", 
-            command=self._start_processing,
-            font=('Helvetica', 12, 'bold'),
-            bg='#4CAF50',
-            fg='white',
-            activebackground='#45a049',
-            activeforeground='white',
-            padx=20,
-            pady=10,
-            cursor='hand2'
-        )
-        self.start_btn.pack(side=tk.LEFT, padx=(0, 15))
+        # =========================================================================
+        # EDIT: Use ttk.Button for macOS compatibility (tk.Button colors don't work on Mac)
+        # =========================================================================
+        # Detect platform for button styling
+        is_macos = sys.platform == 'darwin'
         
-        # STOP button
-        self.stop_btn = tk.Button(
-            button_container, 
-            text="⏹  STOP", 
-            command=self._stop_processing,
-            font=('Helvetica', 10, 'bold'),
-            bg='#f44336',
-            fg='white',
-            activebackground='#da190b',
-            activeforeground='white',
-            padx=15,
-            pady=8,
-            state=tk.DISABLED,
-            cursor='hand2'
-        )
-        self.stop_btn.pack(side=tk.LEFT, padx=(0, 15))
-        
-        # Open Report button
-        self.open_report_btn = tk.Button(
-            button_container,
-            text="📄  Open Last Report",
-            command=self._open_report,
-            font=('Helvetica', 10),
-            bg='#2196F3',
-            fg='white',
-            activebackground='#1976D2',
-            activeforeground='white',
-            padx=15,
-            pady=8,
-            state=tk.DISABLED,
-            cursor='hand2'
-        )
-        self.open_report_btn.pack(side=tk.RIGHT)
+        if is_macos:
+            # macOS: Use ttk.Button (custom colors not supported, but buttons work)
+            self.start_btn = ttk.Button(
+                button_container, 
+                text="▶  START CHECKING", 
+                command=self._start_processing,
+                width=20
+            )
+            self.start_btn.pack(side=tk.LEFT, padx=(0, 15))
+            
+            self.stop_btn = ttk.Button(
+                button_container, 
+                text="⏹  STOP", 
+                command=self._stop_processing,
+                width=10,
+                state=tk.DISABLED
+            )
+            self.stop_btn.pack(side=tk.LEFT, padx=(0, 15))
+            
+            self.open_report_btn = ttk.Button(
+                button_container,
+                text="📄  Open Last Report",
+                command=self._open_report,
+                width=18,
+                state=tk.DISABLED
+            )
+            self.open_report_btn.pack(side=tk.RIGHT)
+        else:
+            # Windows/Linux: Use tk.Button with custom colors
+            self.start_btn = tk.Button(
+                button_container, 
+                text="▶  START CHECKING", 
+                command=self._start_processing,
+                font=('Helvetica', 12, 'bold'),
+                bg='#4CAF50',
+                fg='white',
+                activebackground='#45a049',
+                activeforeground='white',
+                padx=20,
+                pady=10,
+                cursor='hand2'
+            )
+            self.start_btn.pack(side=tk.LEFT, padx=(0, 15))
+            
+            self.stop_btn = tk.Button(
+                button_container, 
+                text="⏹  STOP", 
+                command=self._stop_processing,
+                font=('Helvetica', 10, 'bold'),
+                bg='#f44336',
+                fg='white',
+                activebackground='#da190b',
+                activeforeground='white',
+                padx=15,
+                pady=8,
+                state=tk.DISABLED,
+                cursor='hand2'
+            )
+            self.stop_btn.pack(side=tk.LEFT, padx=(0, 15))
+            
+            self.open_report_btn = tk.Button(
+                button_container,
+                text="📄  Open Last Report",
+                command=self._open_report,
+                font=('Helvetica', 10),
+                bg='#2196F3',
+                fg='white',
+                activebackground='#1976D2',
+                activeforeground='white',
+                padx=15,
+                pady=8,
+                state=tk.DISABLED,
+                cursor='hand2'
+            )
+            self.open_report_btn.pack(side=tk.RIGHT)
+        # =========================================================================
         
         # Store last report path
         self.last_report_path = None
